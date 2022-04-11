@@ -1,11 +1,13 @@
 import React, { useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from '../../api/axios';
+import useContextApi from '../../hooks/useContextApi';
 
 const Login = () => {
     const emailRef = useRef();
     const passRef = useRef();
     const navigate = useNavigate();
+    const {setUser} = useContextApi();
 
     const formHandler = async (e) => {
         e.preventDefault();
@@ -22,6 +24,7 @@ const Login = () => {
             });
 
             if(response.data.accessToken){
+                setUser(response.data);
                 navigate('/home');
             };
         } catch (error) {
