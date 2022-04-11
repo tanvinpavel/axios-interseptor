@@ -24,6 +24,7 @@ const Login = () => {
             });
 
             if(response.data.accessToken){
+                localStorage.setItem('authToken', response.data.accessToken);
                 setUser(response.data);
                 navigate('/home');
             };

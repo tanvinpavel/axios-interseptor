@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const authMiddleware = require('./middleware/authMiddleware');
+const cookieParser = require('cookie-parser')
 
 const app = express();
 
@@ -22,7 +23,8 @@ const option = {
 
 const middleware = [
     express.json(),
-    cors(option)
+    cors(option),
+    cookieParser()
 ]
 
 app.use(middleware);
@@ -64,14 +66,14 @@ app.post('/login', (req, res) => {
         name: data.name,
         role: data.role
     }, process.env.ACCESS_TOKEN_KEY, {
-        expiresIn: '15m'
+        expiresIn: '5s'
     });
 
     const refreshToken = jwt.sign({
         id: data.id,
         name: data.name,
         role: data.role
-    }, process.env.ACCESS_TOKEN_KEY, {
+    }, process.env.REFRESH_TOKEN_KEY, {
         expiresIn: '1d'
     });
 
@@ -81,9 +83,42 @@ app.post('/login', (req, res) => {
     res.status(200).json({...data, accessToken});
 });
 
+//refresh token to create new accessToken
+app.get('/refreshToken', (req, res) => {
+    const token = req.cookies;
+    // console.log(token);
+
+    if(!token) return res.json('no refresh token found');
+
+    const refreshToken = token?.jwt;
+
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY, (err, decode) => {
+        if(err) return res.json('Authorization Failed, refresh token expire, please login again');
+
+        if(decode){
+            const newAccessToken = jwt.sign({
+                id: decode.id,
+                name: decode.name,
+                role: decode.role
+            }, process.env.ACCESS_TOKEN_KEY, {
+                expiresIn: '10s'
+            });
+
+            res.json({
+                id: decode.id,
+                name: decode.name,
+                role: decode.role,
+                accessToken: newAccessToken
+            });
+        }
+    })
+
+})
+
+//accessToken
 app.delete('/delete/:id', authMiddleware, (req, res) => {
     const id = parseInt(req.params.id);
-    console.log(req.data);
+    // console.log(req.headers.authorization);
 
     const deleteData = users.filter(user => user.id !== id);
     if(!deleteData){

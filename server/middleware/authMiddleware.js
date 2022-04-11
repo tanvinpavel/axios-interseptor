@@ -2,14 +2,15 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const authMiddleware = (req, res, next)=>{
-    const authorization = req.headers.authorization;
+    const tokenHeader = req.headers.authorization;
 
-    if(!authorization) return res.json('Unauthorized user 1');
+    if(!tokenHeader) return res.json('Unauthorized user 1');
 
-    const accessToken = authorization.replace('Bearer ');
+    const accessToken = tokenHeader.replace('Bearer ', '');
+
 
     jwt.verify(accessToken, process.env.ACCESS_TOKEN_KEY, (err, decoded) => {
-        if(err) return res.json('Unauthorized user 2');
+        if(err) return res.sendStatus(403);
 
         req.data = decoded;
 

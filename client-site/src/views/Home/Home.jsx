@@ -1,4 +1,4 @@
-import React from 'react';
+// import useAccessToken from '../../hooks/useAccessToken';
 import useAuth from '../../hooks/useAuth';
 import useContextApi from '../../hooks/useContextApi';
 
@@ -16,6 +16,12 @@ const Home = () => {
             console.log(error);
         }
     }
+    // const token = useAccessToken();   
+
+    // const tokenHandler = async () => {
+    //     const x = await token();
+    //     console.log(x);
+    // }
     return (
         <div className='App'>
             <div>
@@ -24,6 +30,7 @@ const Home = () => {
 
                 <button onClick={()=>formHandler(1)}>Delete user 1</button>
                 <button onClick={()=>formHandler(2)}>Delete user 2</button>
+                {/* <button onClick={tokenHandler}>Refresh Token</button> */}
             </div>
         </div>
     );
